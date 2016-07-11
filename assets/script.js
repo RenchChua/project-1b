@@ -101,17 +101,13 @@ $(document).ready(function() {
 
     // check whether the row right of the position selected needs to be changed
 
-    var checkChangeRight = function(positionPlacedArr) {
-      rowNum = positionPlacedArr[0];
-      colNum = positionPlacedArr[1];
+    var checkChangeRight = function(rowNum, colNum) {
       for (i = colNum; i < this.boardArr.length - 1; i++) {
         if (this.boardArr[rowNum][i + 1] === 0) {
           this.toChangeRightArr = [];
           return;
         } else if (this.boardArr[rowNum][i + 1] === this.notPlayerTurnNow) {
-          if (this.toChangeRightArr.indexOf([rowNum, i + 1]) === -1) {
             this.toChangeRightArr.push([rowNum, i + 1]);
-          }
         } else if (this.boardArr[rowNum][i + 1] === this.playerTurnNow) {
           return;
         }
@@ -121,23 +117,48 @@ $(document).ready(function() {
       }
     }.bind(this);
 
+    // check whether the row on the left of the position selected needs to be change
+    var checkChangeLeft = function(rowNum, colNum){
+      for(i = colNum; i > 0; i-- ){
+        if (this.boardArr[rowNum][i-1] === 0){
+          this.toChangeLeftArr = [];
+          return;
+        }else if (this.boardArr[rowNum][i-1] === this.notPlayerTurnNow ){
+          this.toChangeLeftArr.push([rowNum, i-1]);
+        }else if (this.boardArr[rowNum][i-1] === this.playerTurnNow){
+          return;
+        }
+      }
+      if(i === 0){
+        this.toChangeLeftArr = [];
+      }
+    }.bind(this);
+
     // fill array of vald places to position
 
     var checkValidPlaces = function() {
       var checkValidPlacesArr = [];
       for (row = 0; row < 8; row++) {
-        for (col = 0; col < 7; col++) {
+        for (col = 0; col < 8; col++) {
           if (this.boardArr[row][col] === 0) {
-            checkChangeRight([row, col]);
+            checkChangeRight(row, col);
             if (this.toChangeRightArr.length > 0) {
               checkValidPlacesArr.push([row, col]);
             }
+            checkChangeLeft(row, col);
+            if (this.toChangeLeftArr.length > 0){
+              console.log(row, col);
+              checkValidPlacesArr.push([row,col]);
+            }
             this.toChangeRightArr = [];
+            this.toChangeLeftArr = [];
           }
         }
       }
       this.validPositions = checkValidPlacesArr;
     }.bind(this);
+
+    checkValidPlaces();
 
     // check which position has been selected by player, check if anything needs to change, update board display
     $(".space").click(function() {
@@ -157,14 +178,14 @@ $(document).ready(function() {
       for(aNum = 0; aNum < this.validPositions.length; aNum ++){
         if(this.validPositions[aNum][0] === rowNum && this.validPositions[aNum][1] === colNum){
           if (this.turnNumber % 2 === 0) {
-            checkChangeRight([rowNum, colNum]);
+            checkChangeRight(rowNum, colNum);
             this.boardArr[rowNum][colNum] = 1;
             displayNewPiece(rowNum, colNum);
             changeRight(rowNum);
             this.playerTurnNow = -1;
             this.notPlayerTurnNow = 1;
           } else {
-            checkChangeRight([rowNum, colNum]);
+            checkChangeRight(rowNum, colNum);
             this.boardArr[rowNum][colNum] = -1;
             displayNewPiece(rowNum, colNum);
             changeRight(rowNum);
@@ -197,7 +218,7 @@ $(document).ready(function() {
     var removePieces = function(rowNum, colNum) {
       var spaceToRemove = 'sp' + rowNum + colNum;
       $("#" + spaceToRemove).html("");
-    }
+    };
 
     // flip all the pieces that need to be flipped
 
@@ -213,6 +234,7 @@ $(document).ready(function() {
     }.bind(this);
 
     $(".test-btn").click(function() {
+      console.log(this.validPositions);
     }.bind(this));
 
   }; //end of prototype play function
