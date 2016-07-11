@@ -3,11 +3,11 @@ $(document).ready(function() {
     this.boardArr = [
       [0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 1, 1, -1, 0, 0],
-      [0, 0, -1, -1, 1, 0, 0, 0],
-      [0, 1, 1, 1, -1, 0, 0, 0],
+      [0, 0, -1, 0, 1, -1, 1, 0],
+      [0, 1, 0, 1, -1, 1, -1, 0],
       [0, 0, 0, -1, -1, 1, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, -1, 1, 0, 1, -1, 1, 0],
+      [0, 0, 0, -1, 1, 1, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0]
     ];
 
@@ -147,7 +147,6 @@ $(document).ready(function() {
             }
             checkChangeLeft(row, col);
             if (this.toChangeLeftArr.length > 0){
-              console.log(row, col);
               checkValidPlacesArr.push([row,col]);
             }
             this.toChangeRightArr = [];
@@ -175,25 +174,39 @@ $(document).ready(function() {
 
     var updateBoardArr = function(rowNum, colNum) {
       checkValidPlaces();
+      var boardNeedsUpdate = false;
+      console.log(this.validPositions);
       for(aNum = 0; aNum < this.validPositions.length; aNum ++){
         if(this.validPositions[aNum][0] === rowNum && this.validPositions[aNum][1] === colNum){
-          if (this.turnNumber % 2 === 0) {
-            checkChangeRight(rowNum, colNum);
-            this.boardArr[rowNum][colNum] = 1;
-            displayNewPiece(rowNum, colNum);
-            changeRight(rowNum);
-            this.playerTurnNow = -1;
-            this.notPlayerTurnNow = 1;
-          } else {
-            checkChangeRight(rowNum, colNum);
-            this.boardArr[rowNum][colNum] = -1;
-            displayNewPiece(rowNum, colNum);
-            changeRight(rowNum);
-            this.playerTurnNow = 1;
-            this.notPlayerTurnNow = -1;
+          if (this.boardArr[rowNum][colNum] === 0){
+            if (this.turnNumber % 2 === 0) {
+              checkChangeRight(rowNum, colNum);
+              checkChangeLeft(rowNum, colNum);
+              this.boardArr[rowNum][colNum] = 1;
+              displayNewPiece(rowNum, colNum);
+              changeRight(rowNum);
+              changeLeft(rowNum);
+            } else {
+              checkChangeRight(rowNum, colNum);
+              checkChangeLeft(rowNum, colNum);
+              this.boardArr[rowNum][colNum] = -1;
+              displayNewPiece(rowNum, colNum);
+              changeRight(rowNum);
+              changeLeft(rowNum);
+            }
           }
-          this.turnNumber++;
+          boardNeedsUpdate = true;
         }
+      }
+      if (boardNeedsUpdate === true){
+        if (this.turnNumber % 2 === 0){
+          this.playerTurnNow = -1;
+          this.notPlayerTurnNow = 1;
+        } else{
+          this.playerTurnNow = 1;
+          this.notPlayerTurnNow = -1;
+        }
+        this.turnNumber++;
       }
     }.bind(this);
 
@@ -222,12 +235,23 @@ $(document).ready(function() {
 
     // flip all the pieces that need to be flipped
 
-    var changeRight = function(rowNum){
+    var changeRight = function(rowNum){ // sure this can be refactored to keep DRY
       if (this.toChangeRightArr.length > 0){
         for(i = 0; i < this.toChangeRightArr.length; i++ ){
           this.boardArr[rowNum][this.toChangeRightArr[i][1]] = this.playerTurnNow;
           removePieces(rowNum, this.toChangeRightArr[i][1]);
           displayNewPiece(rowNum, this.toChangeRightArr[i][1]);
+        }
+      }
+      this.toChangeRightArr = [];
+    }.bind(this);
+
+    var changeLeft = function(rowNum){ //sure this can be refactored to keep DRY...
+      if (this.toChangeLeftArr.length > 0){
+        for(i = 0; i < this.toChangeLeftArr.length; i++ ){
+          this.boardArr[rowNum][this.toChangeLeftArr[i][1]] = this.playerTurnNow;
+          removePieces(rowNum, this.toChangeLeftArr[i][1]);
+          displayNewPiece(rowNum, this.toChangeLeftArr[i][1]);
         }
       }
       this.toChangeRightArr = [];
