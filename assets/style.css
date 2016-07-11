@@ -43,9 +43,27 @@
 
 .space{
   display: inline-block;
+  vertical-align: top;
   width: 95%;
   height: 95%;
   position: relative;
   left: 0.5px;
   top: 0.5px;
+}
+
+.piece{
+  position: relative;
+  top: 15px;
+  left: 12px;
+  transform: scale(1.5);
+}
+
+.test-btn{
+  display: block;
+  border: 1px solid black;
+  width: 100px;
+  height: 50px;
+  position: absolute;
+  bottom: 100px;
+  right: 100px;
 }
