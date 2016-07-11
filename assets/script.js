@@ -199,14 +199,20 @@ $(document).ready(function() {
         }
       }
       if (boardNeedsUpdate === true){
-        if (this.turnNumber % 2 === 0){
-          this.playerTurnNow = -1;
-          this.notPlayerTurnNow = 1;
-        } else{
-          this.playerTurnNow = 1;
-          this.notPlayerTurnNow = -1;
-        }
+        switchPlayers();
         this.turnNumber++;
+      }
+    }.bind(this);
+
+    // change turns function
+
+    var switchPlayers = function(){
+      if (this.turnNumber % 2 === 0){
+        this.playerTurnNow = -1;
+        this.notPlayerTurnNow = 1;
+      } else{
+        this.playerTurnNow = 1;
+        this.notPlayerTurnNow = -1;
       }
     }.bind(this);
 
