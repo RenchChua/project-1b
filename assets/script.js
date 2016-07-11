@@ -60,8 +60,13 @@ $(document).ready(function(){
 
     drawBoard();
 
-    
+    boundBoardArr = this.boardArr
 
+    $(".space").on("click", function(){
+      rowNum = parseInt(this.id.charAt(2));
+      colNum = parseInt(this.id.charAt(3));
+      console.log(boundBoardArr[rowNum][colNum]);
+      });
 
   }; //end of prototype play function
 
