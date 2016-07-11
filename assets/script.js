@@ -157,15 +157,19 @@ $(document).ready(function() {
       for(aNum = 0; aNum < this.validPositions.length; aNum ++){
         if(this.validPositions[aNum][0] === rowNum && this.validPositions[aNum][1] === colNum){
           if (this.turnNumber % 2 === 0) {
-            this.playerTurnNow = -1;
-            this.notPlayerTurnNow = 1;
+            checkChangeRight([rowNum, colNum]);
             this.boardArr[rowNum][colNum] = 1;
             displayNewPiece(rowNum, colNum);
+            changeRight(rowNum);
+            this.playerTurnNow = -1;
+            this.notPlayerTurnNow = 1;
           } else {
-            this.playerTurnNow = 1;
-            this.notPlayerTurnNow = -1;
+            checkChangeRight([rowNum, colNum]);
             this.boardArr[rowNum][colNum] = -1;
             displayNewPiece(rowNum, colNum);
+            changeRight(rowNum);
+            this.playerTurnNow = 1;
+            this.notPlayerTurnNow = -1;
           }
           this.turnNumber++;
         }
@@ -189,10 +193,27 @@ $(document).ready(function() {
       }
     }.bind(this);
 
-    $(".test-btn").click(function() {
-      console.log(this.playerTurnNow);
-    }.bind(this));
+    //  remove pieces
+    var removePieces = function(rowNum, colNum) {
+      var spaceToRemove = 'sp' + rowNum + colNum;
+      $("#" + spaceToRemove).html("");
+    }
 
+    // flip all the pieces that need to be flipped
+
+    var changeRight = function(rowNum){
+      if (this.toChangeRightArr.length > 0){
+        for(i = 0; i < this.toChangeRightArr.length; i++ ){
+          this.boardArr[rowNum][this.toChangeRightArr[i][1]] = this.playerTurnNow;
+          removePieces(rowNum, this.toChangeRightArr[i][1]);
+          displayNewPiece(rowNum, this.toChangeRightArr[i][1]);
+        }
+      }
+      this.toChangeRightArr = [];
+    }.bind(this);
+
+    $(".test-btn").click(function() {
+    }.bind(this));
 
   }; //end of prototype play function
 
