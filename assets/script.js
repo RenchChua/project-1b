@@ -99,7 +99,7 @@ $(document).ready(function() {
 
     displayPieces();
 
-    // check whether the row right of the position selected needs to be changed
+    // check whether the pieces in the same row to the right of the position selected needs to be changed
 
     var checkChangeRight = function(rowNum, colNum) {
       for (i = colNum; i < this.boardArr.length - 1; i++) {
@@ -117,7 +117,7 @@ $(document).ready(function() {
       }
     }.bind(this);
 
-    // check whether the row on the left of the position selected needs to be change
+    // check whether the pieces in the same row to the left of the position selected needs to be changed
     var checkChangeLeft = function(rowNum, colNum){
       for(i = colNum; i > 0; i-- ){
         if (this.boardArr[rowNum][i-1] === 0){
@@ -131,6 +131,40 @@ $(document).ready(function() {
       }
       if(i === 0){
         this.toChangeLeftArr = [];
+      }
+    }.bind(this);
+
+    // check whether the pieces in the column below the position selected needs to be changed
+    var checkChangeDown = function(rowNum, colNum) {
+
+      for (i = rowNum; i < this.boardArr.length - 1; i++) {
+        if (this.boardArr[i + 1][colNum] === 0) {
+          this.toChangeDownArr = [];
+          return;
+        } else if (this.boardArr[i + 1][colNum] === this.notPlayerTurnNow) {
+            this.toChangeDownArr.push([i + 1 , colNum]);
+        } else if (this.boardArr[i + 1][colNum] === this.playerTurnNow) {
+          return;
+        }
+      }
+      if (i === 7) {
+        this.toChangeDownArr = [];
+      }
+    }.bind(this);
+
+    var checkChangeUp = function(rowNum, colNum) {
+      for (i = rowNum; i > 0; i--) {
+        if (this.boardArr[i - 1][colNum] === 0) {
+          this.toChangeUpArr = [];
+          return;
+        } else if (this.boardArr[i - 1][colNum] === this.notPlayerTurnNow) {
+            this.toChangeUpArr.push([i - 1 , colNum]);
+        } else if (this.boardArr[i - 1][colNum] === this.playerTurnNow) {
+          return;
+        }
+      }
+      if (i === 7) {
+        this.toChangeUpArr = [];
       }
     }.bind(this);
 
@@ -149,8 +183,18 @@ $(document).ready(function() {
             if (this.toChangeLeftArr.length > 0){
               checkValidPlacesArr.push([row,col]);
             }
+            checkChangeDown(row, col);
+            if (this.toChangeDownArr.length > 0){
+              checkValidPlacesArr.push([row,col]);
+            }
+            checkChangeUp(row, col);
+            if (this.toChangeUpArr.length > 0){
+              checkValidPlacesArr.push([row,col]);
+            }
             this.toChangeRightArr = [];
             this.toChangeLeftArr = [];
+            this.toChangeDownArr = [];
+            this.toChangeUpArr = [];
           }
         }
       }
@@ -175,24 +219,35 @@ $(document).ready(function() {
     var updateBoardArr = function(rowNum, colNum) {
       checkValidPlaces();
       var boardNeedsUpdate = false;
-      console.log(this.validPositions);
       for(aNum = 0; aNum < this.validPositions.length; aNum ++){
         if(this.validPositions[aNum][0] === rowNum && this.validPositions[aNum][1] === colNum){
           if (this.boardArr[rowNum][colNum] === 0){
             if (this.turnNumber % 2 === 0) {
+              // can put all the checks into one separate function to make this DRYer
               checkChangeRight(rowNum, colNum);
               checkChangeLeft(rowNum, colNum);
+              checkChangeDown(rowNum, colNum);
+              checkChangeUp(rowNum, colNum);
               this.boardArr[rowNum][colNum] = 1;
               displayNewPiece(rowNum, colNum);
+              // can put all the changes into one separate function to make this DRYer
               changeRight(rowNum);
               changeLeft(rowNum);
+              changeDown(colNum);
+              changeUp(colNum)
             } else {
+              // can put all the checks into one separate function to make this DRYer
               checkChangeRight(rowNum, colNum);
               checkChangeLeft(rowNum, colNum);
+              checkChangeDown(rowNum, colNum);
+              checkChangeUp(rowNum, colNum);
               this.boardArr[rowNum][colNum] = -1;
               displayNewPiece(rowNum, colNum);
+              // can put all the changes into one separate function to make this DRYer
               changeRight(rowNum);
               changeLeft(rowNum);
+              changeDown(colNum);
+              changeUp(colNum);
             }
           }
           boardNeedsUpdate = true;
@@ -262,6 +317,29 @@ $(document).ready(function() {
       }
       this.toChangeRightArr = [];
     }.bind(this);
+
+    var changeDown = function(colNum){ //sure this can be refactored to keep DRY...
+      if (this.toChangeDownArr.length > 0){
+        for(i = 0; i < this.toChangeDownArr.length; i++ ){
+          this.boardArr[this.toChangeDownArr[i][0]][colNum] = this.playerTurnNow;
+          removePieces(this.toChangeDownArr[i][0], colNum);
+          displayNewPiece(this.toChangeDownArr[i][0], colNum);
+        }
+      }
+      this.toChangeDownArr = [];
+    }.bind(this);
+
+    var changeUp= function(colNum){ //sure this can be refactored to keep DRY...
+      if (this.toChangeUpArr.length > 0){
+        for(i = 0; i < this.toChangeUpArr.length; i++ ){
+          this.boardArr[this.toChangeUpArr[i][0]][colNum] = this.playerTurnNow;
+          removePieces(this.toChangeUpArr[i][0], colNum);
+          displayNewPiece(this.toChangeUpArr[i][0], colNum);
+        }
+      }
+      this.toChangeDownArr = [];
+    }.bind(this);
+
 
     $(".test-btn").click(function() {
       console.log(this.validPositions);
