@@ -136,7 +136,6 @@ $(document).ready(function() {
 
     // check whether the pieces in the column below the position selected needs to be changed
     var checkChangeDown = function(rowNum, colNum) {
-
       for (i = rowNum; i < this.boardArr.length - 1; i++) {
         if (this.boardArr[i + 1][colNum] === 0) {
           this.toChangeDownArr = [];
@@ -168,6 +167,33 @@ $(document).ready(function() {
       }
     }.bind(this);
 
+    var checkDiagonal1 = function(rowNum, colNum){
+      for(i = 0; i < this.boardArr.length - 1; i++){
+        if(rowNum >= this.boardArr.length - 1){
+          return;
+        }else if(colNum >= this.boardArr.length - 1){
+          return;
+        }else if((rowNum + i === this.boardArr.length - 1) && (this.boardArr[rowNum + i][colNum + i] === this.notPlayerTurnNow)){
+          this.toChangeDiagonal1 = [];
+          return;
+        }else if(colNum + i === this.boardArr.length - 1 && this.boardArr[rowNum + i][colNum + i] === this.notPlayerTurnNow){
+          this.toChangeDiagonal1 = [];
+          return;
+        } else if(this.boardArr[rowNum + i + 1][colNum + i + 1] === 0){
+          this.toChangeDiagonal1 = [];
+          return;
+        }else if (this.boardArr[rowNum + i + 1][colNum + i + 1] === this.notPlayerTurnNow ){
+          this.toChangeDiagonal1.push([rowNum + i + 1, colNum + i + 1]);
+        }else if ( this.boardArr[rowNum + i + 1][colNum + i + 1] === this.playerTurnNow){
+          return;
+        }
+      }
+      if(i === this.boardArr.length - 1){
+        this.toChangeDiagonal1 = [];
+        return;
+      }
+    }.bind(this);
+
     // fill array of vald places to position
 
     var checkValidPlaces = function() {
@@ -191,10 +217,15 @@ $(document).ready(function() {
             if (this.toChangeUpArr.length > 0){
               checkValidPlacesArr.push([row,col]);
             }
+            checkDiagonal1(row, col);
+            if (this.toChangeDiagonal1.length > 0){
+              checkValidPlacesArr.push([row,col]);
+            }
             this.toChangeRightArr = [];
             this.toChangeLeftArr = [];
             this.toChangeDownArr = [];
             this.toChangeUpArr = [];
+            this.toChangeDiagonal1 = [];
           }
         }
       }
@@ -217,8 +248,8 @@ $(document).ready(function() {
     // update the boardArr and display new piece placed
 
     var updateBoardArr = function(rowNum, colNum) {
-      checkValidPlaces();
       var boardNeedsUpdate = false;
+      checkValidPlaces();
       for(aNum = 0; aNum < this.validPositions.length; aNum ++){
         if(this.validPositions[aNum][0] === rowNum && this.validPositions[aNum][1] === colNum){
           if (this.boardArr[rowNum][colNum] === 0){
@@ -228,19 +259,22 @@ $(document).ready(function() {
               checkChangeLeft(rowNum, colNum);
               checkChangeDown(rowNum, colNum);
               checkChangeUp(rowNum, colNum);
+              checkDiagonal1(rowNum, colNum);
               this.boardArr[rowNum][colNum] = 1;
               displayNewPiece(rowNum, colNum);
               // can put all the changes into one separate function to make this DRYer
               changeRight(rowNum);
               changeLeft(rowNum);
               changeDown(colNum);
-              changeUp(colNum)
+              changeUp(colNum);
+              changeDiagonal1(rowNum, colNum);
             } else {
               // can put all the checks into one separate function to make this DRYer
               checkChangeRight(rowNum, colNum);
               checkChangeLeft(rowNum, colNum);
               checkChangeDown(rowNum, colNum);
               checkChangeUp(rowNum, colNum);
+              checkDiagonal1(rowNum, colNum);
               this.boardArr[rowNum][colNum] = -1;
               displayNewPiece(rowNum, colNum);
               // can put all the changes into one separate function to make this DRYer
@@ -248,6 +282,7 @@ $(document).ready(function() {
               changeLeft(rowNum);
               changeDown(colNum);
               changeUp(colNum);
+              changeDiagonal1();
             }
           }
           boardNeedsUpdate = true;
@@ -329,7 +364,7 @@ $(document).ready(function() {
       this.toChangeDownArr = [];
     }.bind(this);
 
-    var changeUp= function(colNum){ //sure this can be refactored to keep DRY...
+    var changeUp = function(colNum){ //sure this can be refactored to keep DRY...
       if (this.toChangeUpArr.length > 0){
         for(i = 0; i < this.toChangeUpArr.length; i++ ){
           this.boardArr[this.toChangeUpArr[i][0]][colNum] = this.playerTurnNow;
@@ -337,7 +372,17 @@ $(document).ready(function() {
           displayNewPiece(this.toChangeUpArr[i][0], colNum);
         }
       }
-      this.toChangeDownArr = [];
+      this.toChangeUpArr = [];
+    }.bind(this);
+
+    var changeDiagonal1 = function(){
+      if (this.toChangeDiagonal1.length > 0){
+        for(i = 0; i < this.toChangeDiagonal1.length; i++ ){
+          this.boardArr[this.toChangeDiagonal1[i][0]][this.toChangeDiagonal1[i][1]] = this.playerTurnNow;
+          removePieces(this.toChangeDiagonal1[i][0], this.toChangeDiagonal1[i][1]);
+          displayNewPiece(this.toChangeDiagonal1[i][0], this.toChangeDiagonal1[i][1]);
+        }
+      }
     }.bind(this);
 
 
