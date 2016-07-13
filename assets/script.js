@@ -1,14 +1,14 @@
 $(document).ready(function() {
   var Reversi = function() {
     this.boardArr = [
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, -1, 1, 0, 0, 0],
-      [0, 0, 0, 1, -1, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0]
+      [1, 1, 1, 1, 1, 1, 1, 1],
+      [-1, -1, -1, -1, -1, -1, -1, 0],
+      [1, -1, 1, 1, 1, 1, -1, 1],
+      [1, 1, 1, -1, 1, 1, 1, 1],
+      [-1, 1, 1, 1, -1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, -1],
+      [1, 1, 1, 1, 1, 0, 1, 0],
+      [1, 0, 1, 1, 1, 1, 1, 1]
     ];
 
     this.player1Score = 2;
@@ -353,6 +353,11 @@ $(document).ready(function() {
       updateBoardArr(rowNum, colNum);
     });
 
+    $(".restart-btn").click(function(){
+      console.log("clicked");
+      restartGame();
+    });
+
     // update the boardArr and display new piece placed
     var updateBoardArr = function(rowNum, colNum) {
       var boardNeedsUpdate = false;
@@ -406,10 +411,28 @@ $(document).ready(function() {
 
     var checkEndByNoValidMoves = function(){
       if(this.noValidMoves === 2){
-        console.log("game has ended!");
+        $("#pop-up-background-container").css("display", "block");
+        if(this.player1Score > this.player2Score){
+            $("#pop-up-message").text("BLACK WON!");
+        }else if(this.player1Score < this.player2Score){
+          $("#pop-up-message").text("WHITE WON!");
+        }else{
+          $("#pop-up-message").text("ITS A DRAW!");
+        }
+        $(".close-text").text("AGAIN!");
+        $("#pop-up-close").click(function(){
+          $("#pop-up-background-container").css("display", "none");
+          restartGame();
+          checkValidPlaces();
+          return;
+        });
         return;
       }else if(this.validPositions.length === 0){
-        console.log("no more valid moves for you!");
+        $("#pop-up-background-container").css("display", "block");
+        $("#pop-up-message").text("NO VALID MOVES. MOVING ON...");
+        $("#pop-up-close").click(function(){
+          $("#pop-up-background-container").css("display", "none");
+        });
         this.noValidMoves ++;
         switchPlayers();
         checkValidPlaces();
@@ -589,10 +612,26 @@ $(document).ready(function() {
       $('.white-score-text-container').text('SCORE: ' + this.player2Score);
     }.bind(this);
 
-    $(".test-btn").click(function() {
-      console.log(this.validPositions);
-    }.bind(this));
-
+    var restartGame = function(){
+      for(i = 0; i < this.boardArr.length; i ++){
+        console.log(i);
+        for(j = 0; j < this.boardArr.length; j ++){
+          this.boardArr[i][j] = 0;
+          removePieces(i, j);
+        }
+      }
+      for(i = 1; i < 3; i ++){
+        this.boardArr[2 + i][2 + i] = -1;
+        displayNewPiece(2 + i, 2 + i);
+        this.boardArr[5 - i][2 + i] = 1;
+        displayNewPiece(5 - i, 2 + i);
+      }
+      checkScore();
+      this.playerTurnNow = -1;
+      this.notPlayerTurnNow = 1;
+      this.noValidMoves = 0;
+      $(".turn-text-container").text("Black's Turn");
+    }.bind(this);
   }; //end of prototype play function
 
   var normalBoard = new Reversi();
