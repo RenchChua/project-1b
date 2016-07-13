@@ -11,6 +11,10 @@ $(document).ready(function() {
       [0, 0, 0, 0, 0, 0, 0, 0]
     ];
 
+    this.player1Score = 2;
+
+    this.player2Score = 2;
+
     this.turnNumber = 1;
 
     this.playerTurnNow = -1; //keeps track of which player's turn it is now
@@ -391,6 +395,9 @@ $(document).ready(function() {
           boardNeedsUpdate = true;
         }
       }
+
+      checkScore();
+
       if (boardNeedsUpdate === true){
         switchPlayers();
         checkEndByNoValidMoves();
@@ -566,7 +573,21 @@ $(document).ready(function() {
       }
     }.bind(this);
 
-
+    var checkScore = function(){
+      this.player1Score = 0;
+      this.player2Score = 0;
+      for(i = 0; i < this.boardArr.length; i ++){
+        for(j = 0; j < this.boardArr.length; j ++){
+          if(this.boardArr[i][j] === -1){
+            this.player1Score ++;
+          }else if(this.boardArr[i][j] === 1){
+            this.player2Score ++;
+          }
+        }
+      }
+      $('.black-score-text-container').text('SCORE: ' + this.player1Score);
+      $('.white-score-text-container').text('SCORE: ' + this.player2Score);
+    }.bind(this);
 
     $(".test-btn").click(function() {
       console.log(this.validPositions);
