@@ -25,8 +25,6 @@ $(document).ready(function() {
 
     this.validPositions = [];
 
-    this.boardDiagonal = [];
-
     this.noValidMoves = 0;
 
     // keeps track of the position of pieces that need to change based on the position that was selected
@@ -424,7 +422,6 @@ $(document).ready(function() {
           $("#pop-up-background-container").css("display", "none");
           restartGame();
           checkValidPlaces();
-          return;
         });
         return;
       }else if(this.validPositions.length === 0){
@@ -629,6 +626,7 @@ $(document).ready(function() {
       checkScore();
       this.playerTurnNow = -1;
       this.notPlayerTurnNow = 1;
+      this.turnNumber = 1;
       this.noValidMoves = 0;
       $(".turn-text-container").text("Black's Turn");
     }.bind(this);
