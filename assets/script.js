@@ -4,8 +4,8 @@ $(document).ready(function() {
       [0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 1, -1, , 0, 0],
       [0, 0, 0, -1, 1, 0, 0, 0],
+      [0, 0, 0, 1, -1, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0]
@@ -233,6 +233,7 @@ $(document).ready(function() {
             return;
           }else if ( this.boardArr[rowNum + i ][colNum - i ] === 0 ) {
             this.toChangeDiagonal3 = [];
+            return;
           }
         }else if (isOnBoard(rowNum + i - 1, colNum - i + 1)) {
           if(this.boardArr[rowNum + i - 1][colNum - i + 1] !== this.playerTurnNow){
@@ -250,10 +251,8 @@ $(document).ready(function() {
       for( i = 1; i < this.boardArr.length; i ++ ){
         if( isOnBoard(rowNum - i , colNum - i ) ){
           if( this.boardArr[rowNum - i][colNum - i] === this.notPlayerTurnNow ){
-            console.log("in first if");
             this.toChangeDiagonal4.push([rowNum - i , colNum - i ]);
           }else if(this.boardArr[rowNum - i ][colNum - i ] === this.playerTurnNow){
-            console.log("in second if");
             return;
           }else if ( this.boardArr[rowNum - i ][colNum - i ] === 0 ) {
             this.toChangeDiagonal4 = [];
@@ -345,46 +344,18 @@ $(document).ready(function() {
           if (this.boardArr[rowNum][colNum] === 0){
             if (this.turnNumber % 2 === 0) {
               // can put all the checks into one separate function to make this DRYer
-              checkChangeRight(rowNum, colNum);
-              checkChangeLeft(rowNum, colNum);
-              checkChangeDown(rowNum, colNum);
-              checkChangeUp(rowNum, colNum);
-              checkDiagonal1(rowNum, colNum);
-              checkDiagonal2(rowNum, colNum);
-              checkDiagonal3(rowNum, colNum);
-              checkDiagonal4(rowNum, colNum);
+              checkPiecesToChange(rowNum, colNum);
               this.boardArr[rowNum][colNum] = 1;
               displayNewPiece(rowNum, colNum);
               // can put all the changes into one separate function to make this DRYer
-              changeRight(rowNum);
-              changeLeft(rowNum);
-              changeDown(colNum);
-              changeUp(colNum);
-              changeDiagonal1();
-              changeDiagonal2();
-              changeDiagonal3();
-              changeDiagonal4();
+              changePiecesEightDir(rowNum, colNum);
             } else {
               // can put all the checks into one separate function to make this DRYer
-              checkChangeRight(rowNum, colNum);
-              checkChangeLeft(rowNum, colNum);
-              checkChangeDown(rowNum, colNum);
-              checkChangeUp(rowNum, colNum);
-              checkDiagonal1(rowNum, colNum);
-              checkDiagonal2(rowNum, colNum);
-              checkDiagonal3(rowNum, colNum);
-              checkDiagonal4(rowNum, colNum);
+              checkPiecesToChange(rowNum, colNum);
               this.boardArr[rowNum][colNum] = -1;
               displayNewPiece(rowNum, colNum);
               // can put all the changes into one separate function to make this DRYer
-              changeRight(rowNum);
-              changeLeft(rowNum);
-              changeDown(colNum);
-              changeUp(colNum);
-              changeDiagonal1();
-              changeDiagonal2();
-              changeDiagonal3();
-              changeDiagonal4();
+              changePiecesEightDir(rowNum, colNum);
             }
           }
           boardNeedsUpdate = true;
@@ -392,6 +363,11 @@ $(document).ready(function() {
       }
       if (boardNeedsUpdate === true){
         switchPlayers();
+        if( this.playerTurnNow === 1){
+          $(".turn-text-container").text("White's Turn");
+        }else{
+          $(".turn-text-container").text("Black's Turn");
+        }
         this.turnNumber++;
       }
     }.bind(this);
@@ -429,6 +405,30 @@ $(document).ready(function() {
     var removePieces = function(rowNum, colNum) {
       var spaceToRemove = 'sp' + rowNum + colNum;
       $("#" + spaceToRemove).html("");
+    };
+
+    // check which positions to flip upon piece placed
+    var checkPiecesToChange = function(rowNum, colNum){
+      checkChangeRight(rowNum, colNum);
+      checkChangeLeft(rowNum, colNum);
+      checkChangeDown(rowNum, colNum);
+      checkChangeUp(rowNum, colNum);
+      checkDiagonal1(rowNum, colNum);
+      checkDiagonal2(rowNum, colNum);
+      checkDiagonal3(rowNum, colNum);
+      checkDiagonal4(rowNum, colNum);
+    };
+
+    // change pieces in the eight directions that need to be changed
+    var changePiecesEightDir = function(rowNum, colNum){
+      changeRight(rowNum);
+      changeLeft(rowNum);
+      changeDown(colNum);
+      changeUp(colNum);
+      changeDiagonal1();
+      changeDiagonal2();
+      changeDiagonal3();
+      changeDiagonal4();
     };
 
     // flip all the pieces that need to be flipped
@@ -479,7 +479,6 @@ $(document).ready(function() {
 
     var changeDiagonal1 = function(){
       if (this.toChangeDiagonal1.length > 0){
-        console.log("changing diagonal 1");
         for(i = 0; i < this.toChangeDiagonal1.length; i++ ){
           this.boardArr[this.toChangeDiagonal1[i][0]][this.toChangeDiagonal1[i][1]] = this.playerTurnNow;
           removePieces(this.toChangeDiagonal1[i][0], this.toChangeDiagonal1[i][1]);
@@ -491,7 +490,6 @@ $(document).ready(function() {
     var changeDiagonal2 = function(){
       if (this.toChangeDiagonal2.length > 0){
         for(i = 0; i < this.toChangeDiagonal2.length; i++ ){
-          console.log('changing diagonal 2');
           this.boardArr[this.toChangeDiagonal2[i][0]][this.toChangeDiagonal2[i][1]] = this.playerTurnNow;
           removePieces(this.toChangeDiagonal2[i][0], this.toChangeDiagonal2[i][1]);
           displayNewPiece(this.toChangeDiagonal2[i][0], this.toChangeDiagonal2[i][1]);
@@ -502,7 +500,6 @@ $(document).ready(function() {
     var changeDiagonal3 = function(){
       if (this.toChangeDiagonal3.length > 0){
         for(i = 0; i < this.toChangeDiagonal3.length; i++ ){
-          console.log('changing diagonal 2');
           this.boardArr[this.toChangeDiagonal3[i][0]][this.toChangeDiagonal3[i][1]] = this.playerTurnNow;
           removePieces(this.toChangeDiagonal3[i][0], this.toChangeDiagonal3[i][1]);
           displayNewPiece(this.toChangeDiagonal3[i][0], this.toChangeDiagonal3[i][1]);
@@ -513,7 +510,6 @@ $(document).ready(function() {
     var changeDiagonal4 = function(){
       if (this.toChangeDiagonal4.length > 0){
         for(i = 0; i < this.toChangeDiagonal4.length; i++ ){
-          console.log('changing diagonal 2');
           this.boardArr[this.toChangeDiagonal4[i][0]][this.toChangeDiagonal4[i][1]] = this.playerTurnNow;
           removePieces(this.toChangeDiagonal4[i][0], this.toChangeDiagonal4[i][1]);
           displayNewPiece(this.toChangeDiagonal4[i][0], this.toChangeDiagonal4[i][1]);

@@ -67,3 +67,32 @@
   bottom: 100px;
   right: 100px;
 }
+
+.side-container{
+  display: block;
+  border: 1px solid black;
+  height: 100px;
+  width: 250px;
+  position: absolute;
+  top: 120px;
+  right: 390px;
+}
+
+.turn-container{
+  display: block;
+  border: 1px solid black;
+  height: 70px;
+  width: 230px;
+  position: absolute;
+  top: 10px;
+  left: 9px;
+}
+
+.turn-text-container{
+  display: block;
+  width: 230px;
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  font-size: 36px;
+}
