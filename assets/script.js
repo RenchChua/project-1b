@@ -256,6 +256,7 @@ $(document).ready(function() {
 
     // check whether the pieces in the diagonal to top left of the position selected needs to be changed
     var checkDiagonal4 = function(rowNum, colNum){
+      console.log("diagonal 4");
       this.toChangeDiagonal4 = [];
       for( i = 1; i < this.boardArr.length; i ++ ){
         if( isOnBoard(rowNum - i , colNum - i ) ){
@@ -423,7 +424,7 @@ $(document).ready(function() {
         }else if(this.player1Score < this.player2Score){
           $("#pop-up-message").text("WHITE WON!");
         }else{
-          $("#pop-up-message").text("ITS A DRAW!");
+          $("#pop-up-message").text("IT'S A DRAW!");
         }
         $(".close-text").text("AGAIN!");
         $("#pop-up-close").click(function(){
@@ -435,6 +436,7 @@ $(document).ready(function() {
       }else if(this.validPositions.length === 0){
         $("#pop-up-background-container").css("display", "block");
         $("#pop-up-message").text("NO VALID MOVES. MOVING ON...");
+        $(".close-text").text("GOT IT");
         $("#pop-up-close").click(function(){
           $("#pop-up-background-container").css("display", "none");
         });
@@ -442,8 +444,8 @@ $(document).ready(function() {
         switchPlayers();
         checkValidPlaces();
         checkEndByNoValidMoves();
-
       }else{
+        checkValidPlaces();
         this.noValidMoves = 0;
         return;
       }
