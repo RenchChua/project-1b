@@ -388,10 +388,6 @@ $(document).ready(function() {
       }
     }.bind(this);
 
-    $(".restart-btn").click(function(){
-      restartGame();
-    });
-
     // update the boardArr and display new piece placed
     var updateBoardArr = function(rowNum, colNum) {
       var boardNeedsUpdate = false;
@@ -416,41 +412,6 @@ $(document).ready(function() {
       }
     }.bind(this);
 
-    var checkEndByNoValidMoves = function(){
-      if(this.noValidMoves === 2){
-        $("#pop-up-background-container").css("display", "block");
-        if(this.player1Score > this.player2Score){
-            $("#pop-up-message").text("BLACK WON!");
-        }else if(this.player1Score < this.player2Score){
-          $("#pop-up-message").text("WHITE WON!");
-        }else{
-          $("#pop-up-message").text("IT'S A DRAW!");
-        }
-        $(".close-text").text("AGAIN!");
-        $("#pop-up-close").click(function(){
-          $("#pop-up-background-container").css("display", "none");
-          restartGame();
-          checkValidPlaces();
-        });
-        return;
-      }else if(this.validPositions.length === 0){
-        $("#pop-up-background-container").css("display", "block");
-        $("#pop-up-message").text("NO VALID MOVES. MOVING ON...");
-        $(".close-text").text("GOT IT");
-        $("#pop-up-close").click(function(){
-          $("#pop-up-background-container").css("display", "none");
-        });
-        this.noValidMoves ++;
-        switchPlayers();
-        checkValidPlaces();
-        checkEndByNoValidMoves();
-      }else{
-        checkValidPlaces();
-        this.noValidMoves = 0;
-        return;
-      }
-    }.bind(this);
-
     // change turns function
 
     var switchPlayers = function(){
@@ -469,6 +430,50 @@ $(document).ready(function() {
       checkValidPlaces();
       this.turnNumber++;
     }.bind(this);
+
+    // check which positions to flip upon piece placed
+    var checkPiecesToChange = function(rowNum, colNum){
+      checkChangeRight(rowNum, colNum);
+      checkChangeLeft(rowNum, colNum);
+      checkChangeDown(rowNum, colNum);
+      checkChangeUp(rowNum, colNum);
+      checkDiagonal1(rowNum, colNum);
+      checkDiagonal2(rowNum, colNum);
+      checkDiagonal3(rowNum, colNum);
+      checkDiagonal4(rowNum, colNum);
+    }.bind(this);
+
+    var getAllPiecesToChange = function(rowNum, colNum){
+      this.allPiecesToChangeArr =[];
+      checkPiecesToChange(rowNum, colNum);
+      this.allPiecesToChangeArr.push(this.toChangeRightArr);
+      this.allPiecesToChangeArr.push(this.toChangeLeftArr);
+      this.allPiecesToChangeArr.push(this.toChangeUpArr);
+      this.allPiecesToChangeArr.push(this.toChangeDownArr);
+      this.allPiecesToChangeArr.push(this.toChangeDiagonal1);
+      this.allPiecesToChangeArr.push(this.toChangeDiagonal2);
+      this.allPiecesToChangeArr.push(this.toChangeDiagonal3);
+      this.allPiecesToChangeArr.push(this.toChangeDiagonal4);
+    }.bind(this);
+
+    var flipPieces = function(){
+      for(i = 0; i < this.allPiecesToChangeArr.length; i ++){
+        for(j = 0; j < this.allPiecesToChangeArr[i].length; j ++){
+          var row = this.allPiecesToChangeArr[i][j][0];
+          var col = this.allPiecesToChangeArr[i][j][1];
+          this.boardArr[row][col] = this.playerTurnNow;
+          removePieces(row, col);
+          displayNewPiece(row, col);
+        }
+      }
+      this.allPiecesToChangeArr = [];
+    }.bind(this);
+
+    // change pieces in the eight directions that need to be changed
+    var changePiecesEightDir = function(rowNum, colNum){
+      getAllPiecesToChange(rowNum, colNum);
+      flipPieces();
+    }.bind(this)
 
     // display new piece placed
 
@@ -491,24 +496,6 @@ $(document).ready(function() {
     var removePieces = function(rowNum, colNum) {
       var spaceToRemove = 'sp' + rowNum + colNum;
       $("#" + spaceToRemove).html("");
-    };
-
-    // check which positions to flip upon piece placed
-    var checkPiecesToChange = function(rowNum, colNum){
-      checkChangeRight(rowNum, colNum);
-      checkChangeLeft(rowNum, colNum);
-      checkChangeDown(rowNum, colNum);
-      checkChangeUp(rowNum, colNum);
-      checkDiagonal1(rowNum, colNum);
-      checkDiagonal2(rowNum, colNum);
-      checkDiagonal3(rowNum, colNum);
-      checkDiagonal4(rowNum, colNum);
-    };
-
-    // change pieces in the eight directions that need to be changed
-    var changePiecesEightDir = function(rowNum, colNum){
-      getAllPiecesToChange(rowNum, colNum);
-      flipPieces();
     };
 
     var checkScore = function(){
@@ -548,31 +535,44 @@ $(document).ready(function() {
       $(".turn-text-container").text("Black's Turn");
     }.bind(this);
 
-    var getAllPiecesToChange = function(rowNum, colNum){
-      this.allPiecesToChangeArr =[];
-      checkPiecesToChange(rowNum, colNum);
-      this.allPiecesToChangeArr.push(this.toChangeRightArr);
-      this.allPiecesToChangeArr.push(this.toChangeLeftArr);
-      this.allPiecesToChangeArr.push(this.toChangeUpArr);
-      this.allPiecesToChangeArr.push(this.toChangeDownArr);
-      this.allPiecesToChangeArr.push(this.toChangeDiagonal1);
-      this.allPiecesToChangeArr.push(this.toChangeDiagonal2);
-      this.allPiecesToChangeArr.push(this.toChangeDiagonal3);
-      this.allPiecesToChangeArr.push(this.toChangeDiagonal4);
+    var checkEndByNoValidMoves = function(){
+      if(this.noValidMoves === 2){
+        $("#pop-up-background-container").css("display", "block");
+        if(this.player1Score > this.player2Score){
+            $("#pop-up-message").text("BLACK WON!");
+        }else if(this.player1Score < this.player2Score){
+          $("#pop-up-message").text("WHITE WON!");
+        }else{
+          $("#pop-up-message").text("IT'S A DRAW!");
+        }
+        $(".close-text").text("AGAIN!");
+        $("#pop-up-close").click(function(){
+          $("#pop-up-background-container").css("display", "none");
+          restartGame();
+          checkValidPlaces();
+        });
+        return;
+      }else if(this.validPositions.length === 0){
+        $("#pop-up-background-container").css("display", "block");
+        $("#pop-up-message").text("NO VALID MOVES. MOVING ON...");
+        $(".close-text").text("GOT IT");
+        $("#pop-up-close").click(function(){
+          $("#pop-up-background-container").css("display", "none");
+        });
+        this.noValidMoves ++;
+        switchPlayers();
+        checkValidPlaces();
+        checkEndByNoValidMoves();
+      }else{
+        checkValidPlaces();
+        this.noValidMoves = 0;
+        return;
+      }
     }.bind(this);
 
-    var flipPieces = function(){
-      for(i = 0; i < this.allPiecesToChangeArr.length; i ++){
-        for(j = 0; j < this.allPiecesToChangeArr[i].length; j ++){
-          var row = this.allPiecesToChangeArr[i][j][0];
-          var col = this.allPiecesToChangeArr[i][j][1];
-          this.boardArr[row][col] = this.playerTurnNow;
-          removePieces(row, col);
-          displayNewPiece(row, col);
-        }
-      }
-      this.allPiecesToChangeArr = [];
-    }.bind(this);
+    $(".restart-btn").click(function(){
+      restartGame();
+    });
 
   }; //end of prototype play function
 
