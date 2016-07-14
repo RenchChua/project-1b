@@ -374,7 +374,7 @@ $(document).ready(function() {
                 var row = this.allPiecesToChangeArr[i][j][0];
                 var col = this.allPiecesToChangeArr[i][j][1];
                 var hintBorderSq = '#sq' + row + col;
-                $(hintBorderSq).css("background-color", "rgba(44, 40, 40, 0.79)");
+                $(hintBorderSq).css("background-color", "rgba(44, 40, 40, 0.45)");
                 $(hintBorderSq).css("border", "1px solid blue");
               }
             }
