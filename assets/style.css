@@ -14,8 +14,8 @@
   width: 600px;
   height: 600px;
   position: relative;
-  left: 25px;
-  top: 27px;
+  left: 23px;
+  top: 20px;
 }
 
 .square{
@@ -26,19 +26,19 @@
 }
 
 .top-row{
-  border-top: 5px solid black;
+  border-top: 5px solid black!important;
 }
 
 .bottom-row{
-  border-bottom: 5px solid black;
+  border-bottom: 5px solid black!important;
 }
 
 .left-column{
-  border-left: 5px solid black;
+  border-left: 5px solid black!important;
 }
 
 .right-column{
-  border-right: 5px solid black;
+  border-right: 5px solid black!important;
 }
 
 .space{

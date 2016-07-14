@@ -12,19 +12,12 @@ $(document).ready(function() {
     ];
 
     this.player1Score = 2;
-
     this.player2Score = 2;
-
     this.turnNumber = 1;
-
     this.playerTurnNow = -1; //keeps track of which player's turn it is now
-
     this.notPlayerTurnNow = 1; //keeps track of who the player who isn't playing now
-
     this.positionPlaced = [0, 0]; //keeps track of the position that was selected
-
     this.validPositions = [];
-
     this.noValidMoves = 0;
 
     // keeps track of the position of pieces that need to change based on the position that was selected
