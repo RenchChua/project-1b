@@ -1,14 +1,14 @@
 $(document).ready(function() {
   var Reversi = function() {
     this.boardArr = [
-      [1, 1, 1, 1, 1, 1, 1, 1],
-      [-1, -1, -1, -1, -1, -1, -1, 0],
-      [1, -1, 1, 1, 1, 1, -1, 1],
-      [1, 1, 1, -1, 1, 1, 1, 1],
-      [-1, 1, 1, 1, -1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, -1],
-      [1, 1, 1, 1, 1, 0, 1, 0],
-      [1, 0, 1, 1, 1, 1, 1, 1]
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, -1, 1, 0, 0, 0],
+      [0, 0, 0, 1, -1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0]
     ];
 
     this.player1Score = 2;
@@ -36,6 +36,7 @@ $(document).ready(function() {
     this.toChangeDiagonal2 = [];
     this.toChangeDiagonal3 = [];
     this.toChangeDiagonal4 = [];
+    this.allPiecesToChangeArr = [];
 
   }; //end of prototype
 
@@ -324,35 +325,76 @@ $(document).ready(function() {
             if (this.toChangeDiagonal4.length > 0){
               checkValidPlacesArr.push([row,col]);
             }
-            // this.toChangeRightArr = [];
-            // this.toChangeLeftArr = [];
-            // this.toChangeDownArr = [];
-            // this.toChangeUpArr = [];
-            // this.toChangeDiagonal1 = [];
-            // this.toChangeDiagonal2 = [];
-            // this.toChangeDiagonal3 = [];
-            // this.toChangeDiagonal4 = [];
           }
         }
       }
       this.validPositions = checkValidPlacesArr;
+      for(i = 0; i < this.boardArr.length; i ++){
+        for(j = 0; j < this.boardArr.length; j ++){
+          var sqToClearClass = "sq" + i + j;
+          $('#' + sqToClearClass).removeClass('valid-positions1');
+          $('#' + sqToClearClass).removeClass('valid-positions2');
+        }
+      }
+      for(i = 0; i < this.validPositions.length; i ++){
+        var spaceToHover = "sq" + this.validPositions[i][0] + this.validPositions[i][1];
+        if (this.playerTurnNow === -1) {
+          $("#" + spaceToHover).addClass('valid-positions1');
+        }else{
+          $("#" + spaceToHover).addClass('valid-positions2');
+        }
+      }
     }.bind(this);
 
     checkValidPlaces();
 
     // check which position has been selected by player, check if anything needs to change, update board display
     $(".space").click(function() {
-      var validPlacesArr = [];
-      var rowNum = 0;
-      var colNum = 0;
-      rowNum = parseInt(this.id.charAt(2));
-      colNum = parseInt(this.id.charAt(3));
-      positionPlacedArr = [rowNum, colNum];
+      var rowNum = parseInt(this.id.charAt(2));
+      var colNum = parseInt(this.id.charAt(3));
       updateBoardArr(rowNum, colNum);
     });
 
+    $(".space").mouseover(function(){
+      var rowNum = parseInt(this.id.charAt(2));
+      var colNum = parseInt(this.id.charAt(3));
+      positionPlacedArr = [rowNum, colNum];
+      displayHint(rowNum, colNum);
+    });
+
+    var displayHint = function(rowNum, colNum){
+      var hoveredSq = "#sq" + rowNum + colNum;
+      checkValidPlaces();
+      getAllPiecesToChange(rowNum, colNum);
+      for(aNum = 0; aNum < this.validPositions.length; aNum ++){
+        if(this.validPositions[aNum][0] === rowNum && this.validPositions[aNum][1] === colNum){
+          if (this.boardArr[rowNum][colNum] === 0){
+            for(i = 0; i < this.allPiecesToChangeArr.length; i ++){
+              for(j = 0; j < this.allPiecesToChangeArr[i].length; j ++){
+                var row = this.allPiecesToChangeArr[i][j][0];
+                var col = this.allPiecesToChangeArr[i][j][1];
+                var hintBorderSq = '#sq' + row + col;
+                $(hintBorderSq).css("background-color", "rgba(44, 40, 40, 0.79)");
+                $(hintBorderSq).css("border", "1px solid blue");
+              }
+            }
+          }
+        }
+      }
+      $(hoveredSq).mouseout(resetHint);
+    }.bind(this);
+
+    var resetHint = function(){
+      for(i = 0; i < this.boardArr.length; i ++){
+        for(j = 0; j < this.boardArr.length; j ++){
+          var sqReset = "#sq" + i + j;
+          $(sqReset).css("background-color", "rgba(255, 255, 230, 0.7)");
+          $(sqReset).css("border", "1px solid black");
+        }
+      }
+    }.bind(this);
+
     $(".restart-btn").click(function(){
-      console.log("clicked");
       restartGame();
     });
 
@@ -363,37 +405,10 @@ $(document).ready(function() {
       for(aNum = 0; aNum < this.validPositions.length; aNum ++){
         if(this.validPositions[aNum][0] === rowNum && this.validPositions[aNum][1] === colNum){
           if (this.boardArr[rowNum][colNum] === 0){
-            if (this.turnNumber % 2 === 0) {
-              // can put all the checks into one separate function to make this DRYer
-              checkPiecesToChange(rowNum, colNum);
-              // console.log("to change up is " + this.toChangeUpArr);
-              // console.log("to change down is " + this.toChangeDownArr);
-              // console.log("to change left is " + this.toChangeLeftArr);
-              // console.log("to change right is " + this.toChangeRightArr);
-              // console.log("to change diagonal1 is " + this.toChangeDiagonal1);
-              // console.log("to change diagonal2 is " + this.toChangeDiagonal2);
-              // console.log("to change diagonal3 is " + this.toChangeDiagonal3);
-              // console.log("to change diagonal4 is " + this.toChangeDiagonal4);
-              this.boardArr[rowNum][colNum] = 1;
-              displayNewPiece(rowNum, colNum);
-              // can put all the changes into one separate function to make this DRYer
-              changePiecesEightDir(rowNum, colNum);
-            } else {
-              // can put all the checks into one separate function to make this DRYer
-              checkPiecesToChange(rowNum, colNum);
-              // console.log("to change up is " + this.toChangeUpArr);
-              // console.log("to change down is " + this.toChangeDownArr);
-              // console.log("to change left is " + this.toChangeLeftArr);
-              // console.log("to change right is " + this.toChangeRightArr);
-              // console.log("to change diagonal1 is " + this.toChangeDiagonal1);
-              // console.log("to change diagonal2 is " + this.toChangeDiagonal2);
-              // console.log("to change diagonal3 is " + this.toChangeDiagonal3);
-              // console.log("to change diagonal4 is " + this.toChangeDiagonal4);
-              this.boardArr[rowNum][colNum] = -1;
-              displayNewPiece(rowNum, colNum);
-              // can put all the changes into one separate function to make this DRYer
-              changePiecesEightDir(rowNum, colNum);
-            }
+            checkPiecesToChange(rowNum, colNum);
+            this.boardArr[rowNum][colNum] = this.playerTurnNow;
+            displayNewPiece(rowNum, colNum);
+            changePiecesEightDir(rowNum, colNum);
           }
           boardNeedsUpdate = true;
         }
@@ -497,101 +512,9 @@ $(document).ready(function() {
 
     // change pieces in the eight directions that need to be changed
     var changePiecesEightDir = function(rowNum, colNum){
-      changeRight(rowNum);
-      changeLeft(rowNum);
-      changeDown(colNum);
-      changeUp(colNum);
-      changeDiagonal1();
-      changeDiagonal2();
-      changeDiagonal3();
-      changeDiagonal4();
+      getAllPiecesToChange(rowNum, colNum);
+      flipPieces();
     };
-
-    // flip all the pieces that need to be flipped
-
-    var changeRight = function(rowNum){ // sure this can be refactored to keep DRY
-      if (this.toChangeRightArr.length > 0){
-        for(i = 0; i < this.toChangeRightArr.length; i++ ){
-          this.boardArr[rowNum][this.toChangeRightArr[i][1]] = this.playerTurnNow;
-          removePieces(rowNum, this.toChangeRightArr[i][1]);
-          displayNewPiece(rowNum, this.toChangeRightArr[i][1]);
-        }
-      }
-      this.toChangeRightArr = [];
-    }.bind(this);
-
-    var changeLeft = function(rowNum){ //sure this can be refactored to keep DRY...
-      if (this.toChangeLeftArr.length > 0){
-        for(i = 0; i < this.toChangeLeftArr.length; i++ ){
-          this.boardArr[rowNum][this.toChangeLeftArr[i][1]] = this.playerTurnNow;
-          removePieces(rowNum, this.toChangeLeftArr[i][1]);
-          displayNewPiece(rowNum, this.toChangeLeftArr[i][1]);
-        }
-      }
-      this.toChangeRightArr = [];
-    }.bind(this);
-
-    var changeDown = function(colNum){ //sure this can be refactored to keep DRY...
-      if (this.toChangeDownArr.length > 0){
-        for(i = 0; i < this.toChangeDownArr.length; i++ ){
-          this.boardArr[this.toChangeDownArr[i][0]][colNum] = this.playerTurnNow;
-          removePieces(this.toChangeDownArr[i][0], colNum);
-          displayNewPiece(this.toChangeDownArr[i][0], colNum);
-        }
-      }
-      this.toChangeDownArr = [];
-    }.bind(this);
-
-    var changeUp = function(colNum){ //sure this can be refactored to keep DRY...
-      if (this.toChangeUpArr.length > 0){
-        for(i = 0; i < this.toChangeUpArr.length; i++ ){
-          this.boardArr[this.toChangeUpArr[i][0]][colNum] = this.playerTurnNow;
-          removePieces(this.toChangeUpArr[i][0], colNum);
-          displayNewPiece(this.toChangeUpArr[i][0], colNum);
-        }
-      }
-      this.toChangeUpArr = [];
-    }.bind(this);
-
-    var changeDiagonal1 = function(){
-      if (this.toChangeDiagonal1.length > 0){
-        for(i = 0; i < this.toChangeDiagonal1.length; i++ ){
-          this.boardArr[this.toChangeDiagonal1[i][0]][this.toChangeDiagonal1[i][1]] = this.playerTurnNow;
-          removePieces(this.toChangeDiagonal1[i][0], this.toChangeDiagonal1[i][1]);
-          displayNewPiece(this.toChangeDiagonal1[i][0], this.toChangeDiagonal1[i][1]);
-        }
-      }
-    }.bind(this);
-
-    var changeDiagonal2 = function(){
-      if (this.toChangeDiagonal2.length > 0){
-        for(i = 0; i < this.toChangeDiagonal2.length; i++ ){
-          this.boardArr[this.toChangeDiagonal2[i][0]][this.toChangeDiagonal2[i][1]] = this.playerTurnNow;
-          removePieces(this.toChangeDiagonal2[i][0], this.toChangeDiagonal2[i][1]);
-          displayNewPiece(this.toChangeDiagonal2[i][0], this.toChangeDiagonal2[i][1]);
-        }
-      }
-    }.bind(this);
-
-    var changeDiagonal3 = function(){
-      if (this.toChangeDiagonal3.length > 0){
-        for(i = 0; i < this.toChangeDiagonal3.length; i++ ){
-          this.boardArr[this.toChangeDiagonal3[i][0]][this.toChangeDiagonal3[i][1]] = this.playerTurnNow;
-          removePieces(this.toChangeDiagonal3[i][0], this.toChangeDiagonal3[i][1]);
-          displayNewPiece(this.toChangeDiagonal3[i][0], this.toChangeDiagonal3[i][1]);
-        }
-      }
-    }.bind(this);
-
-    var changeDiagonal4 = function(){
-      if (this.toChangeDiagonal4.length > 0){
-        for(i = 0; i < this.toChangeDiagonal4.length; i++ ){
-          this.boardArr[this.toChangeDiagonal4[i][0]][this.toChangeDiagonal4[i][1]] = this.playerTurnNow;
-          removePieces(this.toChangeDiagonal4[i][0], this.toChangeDiagonal4[i][1]);
-          displayNewPiece(this.toChangeDiagonal4[i][0], this.toChangeDiagonal4[i][1]);
-        }
-      }
-    }.bind(this);
 
     var checkScore = function(){
       this.player1Score = 0;
@@ -611,7 +534,6 @@ $(document).ready(function() {
 
     var restartGame = function(){
       for(i = 0; i < this.boardArr.length; i ++){
-        console.log(i);
         for(j = 0; j < this.boardArr.length; j ++){
           this.boardArr[i][j] = 0;
           removePieces(i, j);
@@ -630,6 +552,33 @@ $(document).ready(function() {
       this.noValidMoves = 0;
       $(".turn-text-container").text("Black's Turn");
     }.bind(this);
+
+    var getAllPiecesToChange = function(rowNum, colNum){
+      this.allPiecesToChangeArr =[];
+      checkPiecesToChange(rowNum, colNum);
+      this.allPiecesToChangeArr.push(this.toChangeRightArr);
+      this.allPiecesToChangeArr.push(this.toChangeLeftArr);
+      this.allPiecesToChangeArr.push(this.toChangeUpArr);
+      this.allPiecesToChangeArr.push(this.toChangeDownArr);
+      this.allPiecesToChangeArr.push(this.toChangeDiagonal1);
+      this.allPiecesToChangeArr.push(this.toChangeDiagonal2);
+      this.allPiecesToChangeArr.push(this.toChangeDiagonal3);
+      this.allPiecesToChangeArr.push(this.toChangeDiagonal4);
+    }.bind(this);
+
+    var flipPieces = function(){
+      for(i = 0; i < this.allPiecesToChangeArr.length; i ++){
+        for(j = 0; j < this.allPiecesToChangeArr[i].length; j ++){
+          var row = this.allPiecesToChangeArr[i][j][0];
+          var col = this.allPiecesToChangeArr[i][j][1];
+          this.boardArr[row][col] = this.playerTurnNow;
+          removePieces(row, col);
+          displayNewPiece(row, col);
+        }
+      }
+      this.allPiecesToChangeArr = [];
+    }.bind(this);
+
   }; //end of prototype play function
 
   var normalBoard = new Reversi();
