@@ -36,10 +36,6 @@ $(document).ready(function() {
   Reversi.prototype.play = function() {
 
     // declaring variables needed;
-    var boundBoardArr = this.boardArr;
-    var positionPlacedArr = this.positionPlaced;
-    var boundPlayerTurn = this.playerTurnNow;
-    var boundPlayerNotTurn = this.notPlayerTurnNow;
     var black = "./assets/black.png";
     var white = "./assets/white.png";
 
