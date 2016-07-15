@@ -20,7 +20,7 @@ $(document).ready(function() {
     this.validPositions = [];
     this.noValidMoves = 0;
 
-    // keeps track of the position of pieces that need to change based on the position that was selected
+    // keeps track of the position of pieces that need to change based on the position that was selected.
     this.toChangeRightArr = [];
     this.toChangeLeftArr = [];
     this.toChangeUpArr = [];
