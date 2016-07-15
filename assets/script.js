@@ -126,7 +126,7 @@ $(document).ready(function() {
           return;
         }
       }
-      if(i === 0){
+      if(i === 1){
         this.toChangeLeftArr = [];
       }
     }.bind(this);
@@ -188,14 +188,9 @@ $(document).ready(function() {
             this.toChangeDiagonal1 = [];
             return;
           }
-        }else if (isOnBoard(rowNum + i - 1, colNum + i - 1)) {
-          if(this.boardArr[rowNum + i - 1][colNum + i -1] !== this.playerTurnNow){
-              this.toChangeDiagonal1 = [];
-              return;
-          }else{
-            this.toChangeDiagonal1 = [];
-            return;
-          }
+        }
+        if (i === 7) {
+          this.toChangeDiagonal1 = []
         }
       }
     }.bind(this);
@@ -213,14 +208,9 @@ $(document).ready(function() {
             this.toChangeDiagonal2 = [];
             return;
           }
-        }else if (isOnBoard(rowNum - i + 1, colNum + i - 1)) {
-          if(this.boardArr[rowNum - i + 1][colNum + i -1] !== this.playerTurnNow){
-              this.toChangeDiagonal2 = [];
-              return;
-          }else{
-            this.toChangeDiagonal2 = [];
-            return;
-          }
+        }
+        if (i === 7) {
+          this.toChangeDiagonal2 = [];
         }
       }
     }.bind(this);
@@ -238,25 +228,19 @@ $(document).ready(function() {
             this.toChangeDiagonal3 = [];
             return;
           }
-        }else if (isOnBoard(rowNum + i - 1, colNum - i + 1)) {
-          if(this.boardArr[rowNum + i - 1][colNum - i + 1] !== this.playerTurnNow){
-              this.toChangeDiagonal3 = [];
-              return;
-          }else{
-            this.toChangeDiagonal3 = [];
-            return;
-          }
+        }
+        if (i === 7) {
+          this.toChangeDiagonal3 = [];
         }
       }
     }.bind(this);
 
     // check whether the pieces in the diagonal to top left of the position selected needs to be changed
     var checkDiagonal4 = function(rowNum, colNum){
-      console.log("diagonal 4");
       this.toChangeDiagonal4 = [];
       for( i = 1; i < this.boardArr.length; i ++ ){
         if( isOnBoard(rowNum - i , colNum - i ) ){
-          if( this.boardArr[rowNum - i][colNum - i] === this.notPlayerTurnNow ){
+          if( this.boardArr[rowNum - i][colNum - i] === this.notPlayerTurnNow){
             this.toChangeDiagonal4.push([rowNum - i , colNum - i ]);
           }else if(this.boardArr[rowNum - i ][colNum - i ] === this.playerTurnNow){
             return;
@@ -264,14 +248,9 @@ $(document).ready(function() {
             this.toChangeDiagonal4 = [];
             return;
           }
-        }else if (isOnBoard(rowNum - i + 1, colNum - i + 1)) {
-          if(this.boardArr[rowNum - i + 1][colNum - i + 1] !== this.playerTurnNow){
-              this.toChangeDiagonal4 = [];
-              return;
-          }else{
-            this.toChangeDiagonal4 = [];
-            return;
-          }
+        }
+        if (i === 7 ) {
+          this.toChangeDiagonal4 = [];
         }
       }
     }.bind(this);
@@ -469,7 +448,7 @@ $(document).ready(function() {
     var changePiecesEightDir = function(rowNum, colNum){
       getAllPiecesToChange(rowNum, colNum);
       flipPieces();
-    }.bind(this)
+    }.bind(this);
 
     // display new piece placed
 
